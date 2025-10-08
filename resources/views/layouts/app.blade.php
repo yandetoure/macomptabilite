@@ -96,14 +96,19 @@
                         Cards
                     </a>
 
-                    <div class="pt-4 pb-2">
-                        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Rapports</p>
-                    </div>
+            <div class="pt-4 pb-2">
+                <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Rapports</p>
+            </div>
 
-                    <a href="{{ route('reports.trial-balance') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.trial-balance') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <span class="mr-3">⚖️</span>
-                        Balance
-                    </a>
+            <a href="{{ route('reports.trial-balance') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.trial-balance') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                <span class="mr-3">⚖️</span>
+                Balance
+            </a>
+
+            <a href="{{ route('reports.general-ledger') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.general-ledger') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                <span class="mr-3">📚</span>
+                Grand Livre
+            </a>
 
                     <a href="{{ route('reports.balance-sheet') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.balance-sheet') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <span class="mr-3">📈</span>

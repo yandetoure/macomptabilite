@@ -159,9 +159,54 @@ class ReportController extends Controller
         $netCashFlow = $totalInflows - $totalOutflows;
 
         return view('reports.cash-flow', compact(
-            'cashAccounts', 'currentCash', 
+            'cashAccounts', 'currentCash',
             'cashInflows', 'cashOutflows',
             'totalInflows', 'totalOutflows', 'netCashFlow'
         ));
+    }
+
+    public function generalLedger(Request $request): View
+    {
+        // Filtrer les écritures non réconciliées
+        $showReconciled = $request->get('show_reconciled', false);
+        
+        $accounts = Account::where('is_active', true)
+            ->orderBy('code')
+            ->get();
+
+        // Pour chaque compte, récupérer ses mouvements
+        foreach ($accounts as $account) {
+            $query = \App\Models\JournalEntryLine::whereHas('journalEntry', function($q) use ($showReconciled) {
+                $q->where('status', 'posted');
+                if (!$showReconciled) {
+                    $q->where('is_reconciled', false);
+                }
+            })
+            ->where('account_id', $account->id)
+            ->with(['journalEntry' => function($q) {
+                $q->orderBy('entry_date', 'asc')->orderBy('entry_number', 'asc');
+            }])
+            ->get();
+
+            $account->movements = $query;
+            
+            // Calculer le solde progressif
+            $balance = 0;
+            foreach ($account->movements as $movement) {
+                if (in_array($account->type, ['asset', 'expense'])) {
+                    $balance += $movement->debit - $movement->credit;
+                } else {
+                    $balance += $movement->credit - $movement->debit;
+                }
+                $movement->running_balance = $balance;
+            }
+        }
+
+        // Filtrer les comptes qui ont des mouvements
+        $accounts = $accounts->filter(function($account) {
+            return $account->movements->count() > 0;
+        });
+
+        return view('reports.general-ledger', compact('accounts', 'showReconciled'));
     }
 }
