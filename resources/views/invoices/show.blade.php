@@ -5,11 +5,18 @@
                 Facture {{ $invoice->invoice_number }}
             </h2>
             <div class="flex gap-3">
-                @if($invoice->status != 'paid')
+                @if($invoice->status != 'paid' && $invoice->status != 'partial')
                 <button onclick="document.getElementById('paymentModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                     Marquer comme payé
                 </button>
                 @endif
+                
+                @if($invoice->status == 'paid' || $invoice->status == 'partial')
+                <button onclick="confirmCancelPayment()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    🔄 Annuler le paiement
+                </button>
+                @endif
+                
                 <a href="{{ route('invoices.edit', $invoice) }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
                     Modifier
                 </a>
@@ -25,6 +32,16 @@
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                 {{ session('success') }}
+            </div>
+            @endif
+
+            @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
             @endif
 
@@ -194,5 +211,40 @@
             </form>
         </div>
     </div>
+
+    <!-- Formulaire caché pour annulation paiement -->
+    <form id="cancelPaymentForm" action="{{ route('invoices.cancel-payment', $invoice) }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <script>
+        function confirmCancelPayment() {
+            Swal.fire({
+                title: '⚠️ Annuler le paiement ?',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-3 font-semibold text-gray-700">Cette action va :</p>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600">
+                            <li>Supprimer tous les paiements liés</li>
+                            <li>Supprimer les écritures comptables</li>
+                            <li>Inverser les soldes des comptes</li>
+                            <li>Remettre la facture en "En attente"</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Oui, annuler le paiement',
+                cancelButtonText: 'Non, conserver',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('cancelPaymentForm').submit();
+                }
+            });
+        }
+    </script>
 </x-app-layout>
 

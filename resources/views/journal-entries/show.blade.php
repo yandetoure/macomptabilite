@@ -16,7 +16,7 @@
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h3 class="text-2xl font-bold text-gray-900">{{ $entry->entry_number }}</h3>
-                        <p class="text-sm text-gray-500">{{ $entry->entry_date->format('d/m/Y') }}</p>
+                        <p class="text-sm text-gray-500">{{ $entry->entry_date ? $entry->entry_date->format('d/m/Y') : 'Date non définie' }}</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-sm font-semibold
                         {{ $entry->status === 'posted' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
@@ -107,6 +107,15 @@
                         <span class="text-sm text-gray-500">Paiement lié :</span>
                         <a href="{{ route('payments.show', $entry->payment) }}" class="text-blue-600 hover:text-blue-800 text-sm">
                             {{ $entry->payment->payment_number }}
+                        </a>
+                    </div>
+                    @endif
+
+                    @if($entry->payroll)
+                    <div>
+                        <span class="text-sm text-gray-500">Fiche de paie liée :</span>
+                        <a href="{{ route('payrolls.show', $entry->payroll) }}" class="text-blue-600 hover:text-blue-800 text-sm">
+                            {{ $entry->payroll->payroll_number }}
                         </a>
                     </div>
                     @endif

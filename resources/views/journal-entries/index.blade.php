@@ -29,7 +29,7 @@
                             @forelse($entries ?? [] as $entry)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $entry->entry_number }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $entry->entry_date->format('d/m/Y') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $entry->entry_date ? $entry->entry_date->format('d/m/Y') : '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $entry->reference ?? '-' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-900">{{ Str::limit($entry->description ?? '', 50) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">

@@ -233,19 +233,83 @@ class InvoiceController extends Controller
             $debitAccount = \App\Models\Account::where('code', $debitAccountCode)->first();
             $creditAccount = \App\Models\Account::where('code', $creditAccountCode)->first();
 
-            if ($debitAccount && $creditAccount) {
-                $this->accountingService->createEntryFromPayment(
-                    $payment,
-                    $debitAccount->id,
-                    $creditAccount->id
-                );
+            if (!$debitAccount || !$creditAccount) {
+                logger()->error("Comptes comptables manquants: Débit=$debitAccountCode, Crédit=$creditAccountCode");
+                return redirect()->route('invoices.show', $invoice)
+                    ->withErrors(['error' => "Les comptes comptables nécessaires ($debitAccountCode, $creditAccountCode) n'existent pas. Veuillez les créer dans le plan comptable."]);
             }
+
+            $entry = $this->accountingService->createEntryFromPayment(
+                $payment,
+                $debitAccount->id,
+                $creditAccount->id
+            );
+            
+            logger()->info("Écriture comptable créée: {$entry->entry_number}");
         } catch (\Exception $e) {
             logger()->error('Erreur lors de la création de l\'écriture de paiement: ' . $e->getMessage());
+            return redirect()->route('invoices.show', $invoice)
+                ->withErrors(['error' => 'Erreur lors de la création de l\'écriture comptable: ' . $e->getMessage()]);
         }
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', 'Paiement enregistré avec succès');
+    }
+
+    /**
+     * Annuler le paiement d'une facture
+     */
+    public function cancelPayment(Request $request, Invoice $invoice): RedirectResponse
+    {
+        if ($invoice->status !== 'paid' && $invoice->status !== 'partial') {
+            return redirect()->back()
+                ->withErrors(['error' => 'Cette facture n\'est pas marquée comme payée']);
+        }
+
+        try {
+            \DB::transaction(function () use ($invoice) {
+                // Supprimer tous les paiements liés
+                $payments = $invoice->payments;
+                
+                foreach ($payments as $payment) {
+                    // Supprimer les écritures comptables liées au paiement
+                    $journalEntries = $payment->journalEntries;
+                    
+                    foreach ($journalEntries as $entry) {
+                        // Inverser les soldes des comptes avant de supprimer
+                        foreach ($entry->lines as $line) {
+                            $account = $line->account;
+                            
+                            if (in_array($account->type, ['asset', 'expense'])) {
+                                $account->balance = $account->balance - $line->debit + $line->credit;
+                            } else {
+                                $account->balance = $account->balance - $line->credit + $line->debit;
+                            }
+                            
+                            $account->save();
+                        }
+                        
+                        // Supprimer l'écriture
+                        $entry->delete();
+                    }
+                    
+                    // Supprimer le paiement
+                    $payment->delete();
+                }
+                
+                // Remettre le statut de la facture à pending
+                $invoice->update([
+                    'paid_amount' => 0,
+                    'status' => 'pending',
+                ]);
+            });
+
+            return redirect()->route('invoices.show', $invoice)
+                ->with('success', 'Paiement annulé et écritures comptables supprimées');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Erreur lors de l\'annulation : ' . $e->getMessage()]);
+        }
     }
 
     public function download(Invoice $invoice)

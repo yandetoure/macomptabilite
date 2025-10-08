@@ -18,6 +18,7 @@ class JournalEntry extends Model
         'created_by',
         'invoice_id',
         'payment_id',
+        'payroll_id',
     ];
 
     protected $casts = [
@@ -44,6 +45,11 @@ class JournalEntry extends Model
     public function payment(): BelongsTo
     {
         return $this->belongsTo(Payment::class);
+    }
+
+    public function payroll(): BelongsTo
+    {
+        return $this->belongsTo(Payroll::class);
     }
 
     // Méthodes utiles

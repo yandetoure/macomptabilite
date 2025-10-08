@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Factures (Invoices)
     Route::resource('invoices', InvoiceController::class);
     Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/cancel-payment', [InvoiceController::class, 'cancelPayment'])->name('invoices.cancel-payment');
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
     
     // Paiements (Payments)
