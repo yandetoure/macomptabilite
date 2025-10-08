@@ -53,10 +53,10 @@ class JournalEntryController extends Controller
             ->with('success', 'Écriture créée avec succès');
     }
 
-    public function show(JournalEntry $entry): View
+    public function show(JournalEntry $journal_entry): View
     {
-        $entry->load(['lines.account', 'invoice', 'payment', 'creator']);
+        $journal_entry->load(['lines.account', 'invoice', 'payment', 'payroll.employee', 'creator']);
 
-        return view('journal-entries.show', compact('entry'));
+        return view('journal-entries.show', ['entry' => $journal_entry]);
     }
 }
