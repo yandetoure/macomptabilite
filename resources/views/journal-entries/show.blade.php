@@ -183,24 +183,6 @@
                 </div>
                 @endif
             </div>
-
-            <!-- Debug Info (seulement si en développement) -->
-            @if(config('app.debug'))
-            <div class="mt-6 bg-gray-100 rounded-lg p-4">
-                <h5 class="text-sm font-semibold text-gray-700 mb-2">🔍 Informations de Debug</h5>
-                <div class="text-xs font-mono text-gray-600 space-y-1">
-                    <div><strong>ID:</strong> {{ $entry->id }}</div>
-                    <div><strong>Numéro:</strong> {{ $entry->entry_number }}</div>
-                    <div><strong>Date brute:</strong> {{ $entry->entry_date ?? 'NULL' }}</div>
-                    <div><strong>Statut:</strong> {{ $entry->status }}</div>
-                    <div><strong>Équilibrée:</strong> {{ $entry->is_balanced ? 'Oui' : 'Non' }}</div>
-                    <div><strong>Nombre de lignes:</strong> {{ $entry->lines->count() }}</div>
-                    <div><strong>Total débit:</strong> {{ $entry->getTotalDebit() }}</div>
-                    <div><strong>Total crédit:</strong> {{ $entry->getTotalCredit() }}</div>
-                </div>
-            </div>
-            @endif
         </div>
     </div>
 </x-app-layout>
-

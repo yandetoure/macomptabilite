@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('accounts', AccountController::class);
     
     // Écritures comptables (Journal Entries)
+    Route::get('/journal-entries/journal/view', [JournalEntryController::class, 'journal'])->name('journal-entries.journal');
     Route::resource('journal-entries', JournalEntryController::class);
     Route::post('/journal-entries/{entry}/post', [JournalEntryController::class, 'post'])->name('journal-entries.post');
     

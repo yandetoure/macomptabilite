@@ -59,4 +59,23 @@ class JournalEntryController extends Controller
 
         return view('journal-entries.show', ['entry' => $journal_entry]);
     }
+
+    public function journal(): View
+    {
+        $entries = JournalEntry::with(['lines.account', 'creator'])
+            ->where('status', 'posted')
+            ->orderBy('entry_date', 'asc')
+            ->orderBy('entry_number', 'asc')
+            ->get();
+
+        $totalDebit = 0;
+        $totalCredit = 0;
+
+        foreach ($entries as $entry) {
+            $totalDebit += $entry->getTotalDebit();
+            $totalCredit += $entry->getTotalCredit();
+        }
+
+        return view('journal-entries.journal', compact('entries', 'totalDebit', 'totalCredit'));
+    }
 }
