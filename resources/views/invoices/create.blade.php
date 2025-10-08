@@ -18,14 +18,25 @@
                         @csrf
 
                         <div class="space-y-4">
-                            <div>
-                                <label for="type" class="block text-sm font-medium text-gray-700">Type de facture *</label>
-                                <select name="type" id="type" required onchange="togglePartySelect(this.value)"
-                                    class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm">
-                                    <option value="">Sélectionner...</option>
-                                    <option value="customer" {{ old('type') == 'customer' ? 'selected' : '' }}>Facture Client</option>
-                                    <option value="supplier" {{ old('type') == 'supplier' ? 'selected' : '' }}>Facture Fournisseur</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="type" class="block text-sm font-medium text-gray-700">Type de facture *</label>
+                                    <select name="type" id="type" required onchange="togglePartySelect(this.value)"
+                                        class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm">
+                                        <option value="">Sélectionner...</option>
+                                        <option value="customer" {{ old('type') == 'customer' ? 'selected' : '' }}>Facture Client</option>
+                                        <option value="supplier" {{ old('type') == 'supplier' ? 'selected' : '' }}>Facture Fournisseur</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center pt-6">
+                                    <input type="checkbox" name="is_credit_note" id="is_credit_note" value="1" {{ old('is_credit_note') ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                    <label for="is_credit_note" class="ml-2 block text-sm text-gray-700">
+                                        <span class="font-semibold text-red-600">Facture d'avoir</span>
+                                        <span class="text-xs text-gray-500 block">(Annulation/Remboursement)</span>
+                                    </label>
+                                </div>
                             </div>
 
                             <div id="customer_select" style="display: none;">

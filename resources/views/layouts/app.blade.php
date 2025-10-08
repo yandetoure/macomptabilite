@@ -17,9 +17,9 @@
     <body class="font-sans antialiased bg-gray-50">
         <div class="min-h-screen flex">
             <!-- Sidebar -->
-            <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <aside class="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col z-30">
                 <!-- Logo -->
-                <div class="h-16 flex items-center justify-center border-b border-gray-200">
+                <div class="h-16 flex items-center justify-center border-b border-gray-200 flex-shrink-0">
                     <h1 class="text-2xl font-bold text-blue-600">💼 Compta</h1>
                 </div>
 
@@ -44,6 +44,11 @@
                         Fournisseurs
                     </a>
 
+                    <a href="{{ route('employees.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('employees.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                        <span class="mr-3">👤</span>
+                        Employés
+                    </a>
+
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Facturation</p>
                     </div>
@@ -56,6 +61,15 @@
                     <a href="{{ route('payments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('payments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <span class="mr-3">💰</span>
                         Paiements
+                    </a>
+
+                    <div class="pt-4 pb-2">
+                        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Ressources Humaines</p>
+                    </div>
+
+                    <a href="{{ route('payrolls.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('payrolls.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                        <span class="mr-3">💵</span>
+                        Fiches de paie
                     </a>
 
                     <div class="pt-4 pb-2">
@@ -93,12 +107,17 @@
 
                     <a href="{{ route('reports.financial-statement') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.financial-statement') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <span class="mr-3">📊</span>
-                        État financier
+                        Compte de résultat
+                    </a>
+
+                    <a href="{{ route('reports.cash-flow') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('reports.cash-flow') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                        <span class="mr-3">💧</span>
+                        Flux de trésorerie
                     </a>
                 </nav>
 
                 <!-- User Menu -->
-                <div class="border-t border-gray-200 p-4">
+                <div class="border-t border-gray-200 p-4 flex-shrink-0">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
@@ -111,7 +130,7 @@
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="text-gray-400 hover:text-gray-600">
+                            <button type="submit" class="text-gray-400 hover:text-gray-600" title="Déconnexion">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
@@ -122,9 +141,9 @@
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1 flex flex-col">
+            <div class="flex-1 flex flex-col ml-64">
                 <!-- Top Bar -->
-                <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+                <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-20">
             @isset($header)
                         {{ $header }}
                     @else

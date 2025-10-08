@@ -59,7 +59,12 @@
                             @forelse($invoices as $invoice)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $invoice->invoice_number }}</div>
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $invoice->invoice_number }}
+                                        @if($invoice->is_credit_note)
+                                        <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">AVOIR</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 py-1 text-xs rounded-full {{ $invoice->type == 'customer' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">

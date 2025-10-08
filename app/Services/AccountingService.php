@@ -122,6 +122,76 @@ class AccountingService
     }
 
     /**
+     * Créer une écriture pour un avoir client (inversion de la facture)
+     */
+    public function createEntryFromCustomerCreditNote(Invoice $invoice): JournalEntry
+    {
+        // Ventes au débit (701), Client au crédit (411) - INVERSÉ
+        $customerAccount = Account::where('code', '411')->first();
+        $salesAccount = Account::where('code', '701')->first();
+
+        if (!$customerAccount || !$salesAccount) {
+            throw new \Exception('Comptes comptables non configurés (411, 701)');
+        }
+
+        return $this->createJournalEntry([
+            'entry_date' => $invoice->invoice_date,
+            'reference' => $invoice->invoice_number,
+            'description' => "Avoir client {$invoice->invoice_number} - {$invoice->party_name}",
+            'invoice_id' => $invoice->id,
+            'lines' => [
+                [
+                    'account_id' => $salesAccount->id,
+                    'debit' => $invoice->total_amount,
+                    'credit' => 0,
+                    'description' => 'Annulation vente',
+                ],
+                [
+                    'account_id' => $customerAccount->id,
+                    'debit' => 0,
+                    'credit' => $invoice->total_amount,
+                    'description' => 'Client - Avoir',
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Créer une écriture pour un avoir fournisseur (inversion de la facture)
+     */
+    public function createEntryFromSupplierCreditNote(Invoice $invoice): JournalEntry
+    {
+        // Fournisseur au débit (401), Achats au crédit (601) - INVERSÉ
+        $purchaseAccount = Account::where('code', '601')->first();
+        $supplierAccount = Account::where('code', '401')->first();
+
+        if (!$purchaseAccount || !$supplierAccount) {
+            throw new \Exception('Comptes comptables non configurés (601, 401)');
+        }
+
+        return $this->createJournalEntry([
+            'entry_date' => $invoice->invoice_date,
+            'reference' => $invoice->invoice_number,
+            'description' => "Avoir fournisseur {$invoice->invoice_number} - {$invoice->party_name}",
+            'invoice_id' => $invoice->id,
+            'lines' => [
+                [
+                    'account_id' => $supplierAccount->id,
+                    'debit' => $invoice->total_amount,
+                    'credit' => 0,
+                    'description' => 'Fournisseur - Avoir',
+                ],
+                [
+                    'account_id' => $purchaseAccount->id,
+                    'debit' => 0,
+                    'credit' => $invoice->total_amount,
+                    'description' => 'Annulation achat',
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * Créer une écriture de paiement
      */
     public function createEntryFromPayment(Payment $payment, int $debitAccountId, int $creditAccountId): JournalEntry

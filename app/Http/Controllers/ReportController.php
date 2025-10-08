@@ -81,4 +81,51 @@ class ReportController extends Controller
 
         return view('reports.trial-balance', compact('accounts', 'accountsByType', 'totalDebit', 'totalCredit'));
     }
+
+    public function cashFlow(): View
+    {
+        // Comptes de trésorerie (Banque et Caisse)
+        $cashAccounts = Account::whereIn('code', ['512', '531'])
+            ->where('is_active', true)
+            ->get();
+
+        // Solde de trésorerie actuel
+        $currentCash = $cashAccounts->sum('balance');
+
+        // Mouvements du mois en cours
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+
+        // Entrées (crédits sur comptes de trésorerie)
+        $cashInflows = \App\Models\JournalEntryLine::whereHas('journalEntry', function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->where('status', 'posted')
+                  ->whereBetween('entry_date', [$startOfMonth, $endOfMonth]);
+        })
+        ->whereIn('account_id', $cashAccounts->pluck('id'))
+        ->where('debit', '>', 0)
+        ->with('journalEntry')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        // Sorties (débits sur comptes de trésorerie - négatif car c'est une sortie)
+        $cashOutflows = \App\Models\JournalEntryLine::whereHas('journalEntry', function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->where('status', 'posted')
+                  ->whereBetween('entry_date', [$startOfMonth, $endOfMonth]);
+        })
+        ->whereIn('account_id', $cashAccounts->pluck('id'))
+        ->where('credit', '>', 0)
+        ->with('journalEntry')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $totalInflows = $cashInflows->sum('debit');
+        $totalOutflows = $cashOutflows->sum('credit');
+        $netCashFlow = $totalInflows - $totalOutflows;
+
+        return view('reports.cash-flow', compact(
+            'cashAccounts', 'currentCash', 
+            'cashInflows', 'cashOutflows',
+            'totalInflows', 'totalOutflows', 'netCashFlow'
+        ));
+    }
 }

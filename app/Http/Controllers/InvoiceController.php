@@ -50,6 +50,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required|in:customer,supplier',
+            'is_credit_note' => 'nullable|boolean',
             'customer_id' => 'nullable|exists:customers,id',
             'supplier_id' => 'nullable|exists:suppliers,id',
             'party_name' => 'nullable|string|max:255',
@@ -60,8 +61,33 @@ class InvoiceController extends Controller
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
+        // Remplir party_name depuis customer ou supplier si non fourni
+        if (empty($validated['party_name'])) {
+            if ($validated['type'] === 'customer' && !empty($validated['customer_id'])) {
+                $customer = Customer::find($validated['customer_id']);
+                $validated['party_name'] = $customer ? $customer->name : 'Client';
+            } elseif ($validated['type'] === 'supplier' && !empty($validated['supplier_id'])) {
+                $supplier = Supplier::find($validated['supplier_id']);
+                $validated['party_name'] = $supplier ? $supplier->name : 'Fournisseur';
+            } else {
+                $validated['party_name'] = $validated['type'] === 'customer' ? 'Client' : 'Fournisseur';
+            }
+        }
+
+        // Gérer is_credit_note
+        $validated['is_credit_note'] = $request->has('is_credit_note') ? true : false;
+
         // Générer le numéro de facture
-        $validated['invoice_number'] = $this->accountingService->generateInvoiceNumber($validated['type']);
+        $prefix = $validated['is_credit_note'] ? 'AV' : ($validated['type'] === 'customer' ? 'FC' : 'FF');
+        $year = now()->year;
+        $lastInvoice = Invoice::where('type', $validated['type'])
+            ->where('is_credit_note', $validated['is_credit_note'])
+            ->whereYear('created_at', $year)
+            ->orderBy('id', 'desc')
+            ->first();
+        $nextNumber = $lastInvoice ? ((int) substr($lastInvoice->invoice_number, -4)) + 1 : 1;
+        $validated['invoice_number'] = "{$prefix}-{$year}-" . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+        
         $validated['created_by'] = auth()->id();
         $validated['status'] = 'pending';
 
@@ -75,10 +101,20 @@ class InvoiceController extends Controller
 
         // Créer l'écriture comptable automatiquement
         try {
-            if ($invoice->type === 'customer') {
-                $this->accountingService->createEntryFromCustomerInvoice($invoice);
+            if ($invoice->is_credit_note) {
+                // Pour les avoirs, on inverse les écritures
+                if ($invoice->type === 'customer') {
+                    $this->accountingService->createEntryFromCustomerCreditNote($invoice);
+                } else {
+                    $this->accountingService->createEntryFromSupplierCreditNote($invoice);
+                }
             } else {
-                $this->accountingService->createEntryFromSupplierInvoice($invoice);
+                // Facture normale
+                if ($invoice->type === 'customer') {
+                    $this->accountingService->createEntryFromCustomerInvoice($invoice);
+                } else {
+                    $this->accountingService->createEntryFromSupplierInvoice($invoice);
+                }
             }
         } catch (\Exception $e) {
             // Log l'erreur mais continue

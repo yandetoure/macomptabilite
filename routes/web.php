@@ -10,6 +10,8 @@ use App\Http\Controllers\AccountingCardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PayrollController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -45,10 +47,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Fournisseurs
     Route::resource('suppliers', SupplierController::class);
     
+    // Employés et Paie
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('payrolls', PayrollController::class);
+    Route::post('/payrolls/{payroll}/validate', [PayrollController::class, 'validate'])->name('payrolls.validate');
+    
     // Rapports
     Route::get('/reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial-balance');
     Route::get('/reports/balance-sheet', [ReportController::class, 'balanceSheet'])->name('reports.balance-sheet');
     Route::get('/reports/financial-statement', [ReportController::class, 'financialStatement'])->name('reports.financial-statement');
+    Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

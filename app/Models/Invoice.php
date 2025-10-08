@@ -11,6 +11,7 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number',
         'type',
+        'is_credit_note',
         'customer_id',
         'supplier_id',
         'invoice_date',
@@ -29,6 +30,7 @@ class Invoice extends Model
         'due_date' => 'date',
         'total_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
+        'is_credit_note' => 'boolean',
     ];
 
     // Relations

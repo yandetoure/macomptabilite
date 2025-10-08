@@ -32,19 +32,27 @@
                 <!-- Détails facture -->
                 <div class="lg:col-span-2">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 p-6">
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-900">{{ $invoice->invoice_number }}</h3>
-                                <p class="text-sm text-gray-500">{{ $invoice->type == 'customer' ? 'Facture Client' : 'Facture Fournisseur' }}</p>
-                            </div>
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold
-                                @if($invoice->status === 'paid') bg-green-100 text-green-800
-                                @elseif($invoice->status === 'partial') bg-yellow-100 text-yellow-800
-                                @else bg-orange-100 text-orange-800
-                                @endif">
-                                {{ ucfirst($invoice->status) }}
-                            </span>
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">
+                                {{ $invoice->invoice_number }}
+                                @if($invoice->is_credit_note)
+                                <span class="ml-3 px-3 py-1 text-sm rounded-full bg-red-100 text-red-800 font-semibold">AVOIR</span>
+                                @endif
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                {{ $invoice->is_credit_note ? 'Facture d\'avoir - ' : '' }}
+                                {{ $invoice->type == 'customer' ? 'Client' : 'Fournisseur' }}
+                            </p>
                         </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold
+                            @if($invoice->status === 'paid') bg-green-100 text-green-800
+                            @elseif($invoice->status === 'partial') bg-yellow-100 text-yellow-800
+                            @else bg-orange-100 text-orange-800
+                            @endif">
+                            {{ ucfirst($invoice->status) }}
+                        </span>
+                    </div>
 
                         <dl class="grid grid-cols-2 gap-4 mb-6">
                             <div>
