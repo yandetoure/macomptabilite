@@ -1,0 +1,59 @@
+<?php declare(strict_types=1); 
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\JournalEntryController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AccountingCardController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Plan comptable (Accounts)
+    Route::resource('accounts', AccountController::class);
+    
+    // Écritures comptables (Journal Entries)
+    Route::resource('journal-entries', JournalEntryController::class);
+    Route::post('/journal-entries/{entry}/post', [JournalEntryController::class, 'post'])->name('journal-entries.post');
+    
+    // Factures (Invoices)
+    Route::resource('invoices', InvoiceController::class);
+    Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+    
+    // Paiements (Payments)
+    Route::resource('payments', PaymentController::class);
+    
+    // Cards comptables
+    Route::resource('cards', AccountingCardController::class);
+    Route::post('/cards/{card}/transaction', [AccountingCardController::class, 'createTransaction'])->name('cards.transaction');
+    
+    // Clients
+    Route::resource('customers', CustomerController::class);
+    
+    // Fournisseurs
+    Route::resource('suppliers', SupplierController::class);
+    
+    // Rapports
+    Route::get('/reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial-balance');
+    Route::get('/reports/balance-sheet', [ReportController::class, 'balanceSheet'])->name('reports.balance-sheet');
+    Route::get('/reports/financial-statement', [ReportController::class, 'financialStatement'])->name('reports.financial-statement');
+    
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
