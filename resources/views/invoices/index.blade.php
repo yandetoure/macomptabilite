@@ -81,7 +81,12 @@
                                         @elseif($invoice->status === 'draft') bg-gray-100 text-gray-800
                                         @else bg-orange-100 text-orange-800
                                         @endif">
-                                        {{ ucfirst($invoice->status) }}
+                                        @if($invoice->status === 'draft') Brouillon
+                                        @elseif($invoice->status === 'pending') En attente
+                                        @elseif($invoice->status === 'partial') Partiel
+                                        @elseif($invoice->status === 'paid') Payé
+                                        @else {{ $invoice->status }}
+                                        @endif
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

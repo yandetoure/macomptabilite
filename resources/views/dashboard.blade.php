@@ -144,7 +144,12 @@
                                 <div class="flex-1">
                                     <div class="font-medium text-gray-900">{{ $payment->payment_number }}</div>
                                     <p class="text-sm text-gray-600">
-                                        {{ ucfirst($payment->payment_method) }}
+                                        @if($payment->payment_method === 'cash') Espèces
+                                        @elseif($payment->payment_method === 'bank') Banque
+                                        @elseif($payment->payment_method === 'check') Chèque
+                                        @elseif($payment->payment_method === 'transfer') Virement
+                                        @else Autre
+                                        @endif
                                         @if($payment->invoice)
                                         - {{ $payment->invoice->invoice_number }}
                                         @endif

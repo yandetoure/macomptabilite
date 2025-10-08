@@ -50,7 +50,12 @@
                             @elseif($invoice->status === 'partial') bg-yellow-100 text-yellow-800
                             @else bg-orange-100 text-orange-800
                             @endif">
-                            {{ ucfirst($invoice->status) }}
+                            @if($invoice->status === 'draft') Brouillon
+                            @elseif($invoice->status === 'pending') En attente
+                            @elseif($invoice->status === 'partial') Partiel
+                            @elseif($invoice->status === 'paid') Payé
+                            @else {{ $invoice->status }}
+                            @endif
                         </span>
                     </div>
 

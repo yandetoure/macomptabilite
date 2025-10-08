@@ -36,7 +36,12 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                                        {{ ucfirst($payment->payment_method) }}
+                                        @if($payment->payment_method === 'cash') Espèces
+                                        @elseif($payment->payment_method === 'bank') Banque
+                                        @elseif($payment->payment_method === 'check') Chèque
+                                        @elseif($payment->payment_method === 'transfer') Virement
+                                        @else Autre
+                                        @endif
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">{{ format_currency($payment->amount) }}</td>

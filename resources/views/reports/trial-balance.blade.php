@@ -53,7 +53,13 @@
                                         @elseif($account->type === 'revenue') bg-green-100 text-green-800
                                         @else bg-orange-100 text-orange-800
                                         @endif">
-                                        {{ ucfirst($account->type) }}
+                                        @if($account->type === 'asset') Actif
+                                        @elseif($account->type === 'liability') Passif
+                                        @elseif($account->type === 'equity') Capitaux propres
+                                        @elseif($account->type === 'revenue') Produit
+                                        @elseif($account->type === 'expense') Charge
+                                        @else {{ $account->type }}
+                                        @endif
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm {{ $account->balance > 0 ? 'font-semibold text-gray-900' : 'text-gray-400' }}">

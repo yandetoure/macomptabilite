@@ -30,7 +30,12 @@
                         <dt class="text-sm font-medium text-gray-500">Méthode de paiement</dt>
                         <dd class="mt-1">
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                                {{ ucfirst($payment->payment_method) }}
+                                @if($payment->payment_method === 'cash') Espèces
+                                @elseif($payment->payment_method === 'bank') Banque
+                                @elseif($payment->payment_method === 'check') Chèque
+                                @elseif($payment->payment_method === 'transfer') Virement
+                                @else Autre
+                                @endif
                             </span>
                         </dd>
                     </div>

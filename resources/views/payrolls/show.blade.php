@@ -34,7 +34,11 @@
                         @elseif($payroll->status === 'validated') bg-blue-100 text-blue-800
                         @else bg-gray-100 text-gray-800
                         @endif">
-                        {{ ucfirst($payroll->status) }}
+                        @if($payroll->status === 'draft') Brouillon
+                        @elseif($payroll->status === 'validated') Validé
+                        @elseif($payroll->status === 'paid') Payé
+                        @else {{ $payroll->status }}
+                        @endif
                     </span>
                 </div>
 
