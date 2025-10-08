@@ -15,6 +15,9 @@ class JournalEntry extends Model
         'description',
         'status',
         'is_balanced',
+        'is_reconciled',
+        'reconciled_at',
+        'reconciled_by',
         'created_by',
         'invoice_id',
         'payment_id',
@@ -24,6 +27,8 @@ class JournalEntry extends Model
     protected $casts = [
         'entry_date' => 'date',
         'is_balanced' => 'boolean',
+        'is_reconciled' => 'boolean',
+        'reconciled_at' => 'datetime',
     ];
 
     // Relations

@@ -4,14 +4,44 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Écriture {{ $entry->entry_number }}
             </h2>
-            <a href="{{ route('journal-entries.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
-                ← Retour
-            </a>
+            <div class="flex gap-3">
+                @if($entry->status === 'posted' && !$entry->is_reconciled)
+                <button onclick="confirmReconcile()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    ✓ Réconcilier
+                </button>
+                @endif
+                
+                @if($entry->is_reconciled)
+                <button onclick="confirmUnreconcile()" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                    ↺ Annuler réconciliation
+                </button>
+                @endif
+                
+                <a href="{{ route('journal-entries.index') }}" class="text-sm text-gray-600 hover:text-gray-900 flex items-center">
+                    ← Retour
+                </a>
+            </div>
         </div>
     </x-slot>
 
     <div class="py-8">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+            @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
             <!-- Carte d'en-tête -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 p-6 mb-6">
                 <div class="flex justify-between items-start">
@@ -44,10 +74,17 @@
                             </div>
                         </div>
                     </div>
-                    <span class="px-4 py-2 rounded-full text-sm font-semibold
-                        {{ $entry->status === 'posted' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                        {{ $entry->status === 'posted' ? '✅ Comptabilisé' : '📝 Brouillon' }}
-                    </span>
+                    <div class="flex gap-2">
+                        <span class="px-4 py-2 rounded-full text-sm font-semibold
+                            {{ $entry->status === 'posted' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                            {{ $entry->status === 'posted' ? '✅ Comptabilisé' : '📝 Brouillon' }}
+                        </span>
+                        @if($entry->is_reconciled)
+                        <span class="px-4 py-2 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                            🔒 Réconcilié
+                        </span>
+                        @endif
+                    </div>
                 </div>
 
                 @if($entry->description)
@@ -182,7 +219,75 @@
                     </div>
                 </div>
                 @endif
+
+                @if($entry->is_reconciled && $entry->reconciled_at)
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h5 class="text-sm font-semibold text-blue-800 mb-2">🔒 Informations de Réconciliation</h5>
+                    <div class="text-sm text-gray-700">
+                        <p>Réconcilié le : {{ $entry->reconciled_at->format('d/m/Y à H:i') }}</p>
+                        @if($entry->reconciled_by)
+                        <p>Par : {{ \App\Models\User::find($entry->reconciled_by)?->name ?? 'N/A' }}</p>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
+
+    <!-- Formulaires cachés pour réconciliation -->
+    <form id="reconcileForm" action="{{ route('journal-entries.reconcile', $entry) }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <form id="unreconcileForm" action="{{ route('journal-entries.unreconcile', $entry) }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <script>
+        function confirmReconcile() {
+            Swal.fire({
+                title: '✓ Réconcilier cette écriture ?',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-3 font-semibold text-gray-700">La réconciliation permet de :</p>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600">
+                            <li>Marquer l'écriture comme vérifiée et validée</li>
+                            <li>Masquer cette écriture du bilan et compte de résultat</li>
+                            <li>Garder une trace de la réconciliation</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#059669',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Oui, réconcilier',
+                cancelButtonText: 'Annuler',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('reconcileForm').submit();
+                }
+            });
+        }
+
+        function confirmUnreconcile() {
+            Swal.fire({
+                title: '↺ Annuler la réconciliation ?',
+                text: 'L\'écriture réapparaîtra dans les rapports.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Oui, annuler',
+                cancelButtonText: 'Non',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('unreconcileForm').submit();
+                }
+            });
+        }
+    </script>
 </x-app-layout>

@@ -35,8 +35,13 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($entries ?? [] as $entry)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $entry->entry_number }}</td>
+                            <tr class="{{ $entry->is_reconciled ? 'bg-blue-50' : '' }}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $entry->entry_number }}
+                                    @if($entry->is_reconciled)
+                                    <span class="ml-2 text-xs px-2 py-1 bg-blue-200 text-blue-800 rounded-full">🔒 Réconcilié</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $entry->entry_date ? $entry->entry_date->format('d/m/Y') : '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $entry->reference ?? '-' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-900">{{ Str::limit($entry->description ?? '', 50) }}</td>

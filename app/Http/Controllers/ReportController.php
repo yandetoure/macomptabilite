@@ -11,26 +11,34 @@ class ReportController extends Controller
 {
     public function balanceSheet(): View
     {
-        // Actifs (seulement ceux avec solde non nul)
+        // Récupérer les IDs des comptes concernés par des écritures réconciliées
+        $reconciledAccountIds = \App\Models\JournalEntryLine::whereHas('journalEntry', function($q) {
+            $q->where('is_reconciled', true);
+        })->pluck('account_id')->unique();
+
+        // Actifs (seulement ceux avec solde non nul et non réconciliés)
         $assets = Account::where('type', 'asset')
             ->where('is_active', true)
             ->where('balance', '!=', 0)
+            ->whereNotIn('id', $reconciledAccountIds)
             ->orderBy('code')
             ->get();
         $totalAssets = $assets->sum('balance');
 
-        // Passifs (seulement ceux avec solde non nul)
+        // Passifs (seulement ceux avec solde non nul et non réconciliés)
         $liabilities = Account::where('type', 'liability')
             ->where('is_active', true)
             ->where('balance', '!=', 0)
+            ->whereNotIn('id', $reconciledAccountIds)
             ->orderBy('code')
             ->get();
         $totalLiabilities = $liabilities->sum('balance');
 
-        // Capitaux propres (seulement ceux avec solde non nul)
+        // Capitaux propres (seulement ceux avec solde non nul et non réconciliés)
         $equity = Account::where('type', 'equity')
             ->where('is_active', true)
             ->where('balance', '!=', 0)
+            ->whereNotIn('id', $reconciledAccountIds)
             ->orderBy('code')
             ->get();
         $totalEquity = $equity->sum('balance');
@@ -44,18 +52,25 @@ class ReportController extends Controller
 
     public function financialStatement(): View
     {
-        // Produits (Revenues) - seulement ceux avec solde non nul
+        // Récupérer les IDs des comptes concernés par des écritures réconciliées
+        $reconciledAccountIds = \App\Models\JournalEntryLine::whereHas('journalEntry', function($q) {
+            $q->where('is_reconciled', true);
+        })->pluck('account_id')->unique();
+
+        // Produits (Revenues) - seulement ceux avec solde non nul et non réconciliés
         $revenues = Account::where('type', 'revenue')
             ->where('is_active', true)
             ->where('balance', '!=', 0)
+            ->whereNotIn('id', $reconciledAccountIds)
             ->orderBy('code')
             ->get();
         $totalRevenues = $revenues->sum('balance');
 
-        // Charges (Expenses) - seulement ceux avec solde non nul
+        // Charges (Expenses) - seulement ceux avec solde non nul et non réconciliés
         $expenses = Account::where('type', 'expense')
             ->where('is_active', true)
             ->where('balance', '!=', 0)
+            ->whereNotIn('id', $reconciledAccountIds)
             ->orderBy('code')
             ->get();
         $totalExpenses = $expenses->sum('balance');

@@ -78,4 +78,49 @@ class JournalEntryController extends Controller
 
         return view('journal-entries.journal', compact('entries', 'totalDebit', 'totalCredit'));
     }
+
+    /**
+     * Réconcilier une écriture
+     */
+    public function reconcile(JournalEntry $journal_entry): RedirectResponse
+    {
+        if ($journal_entry->status !== 'posted') {
+            return redirect()->back()
+                ->withErrors(['error' => 'Seules les écritures comptabilisées peuvent être réconciliées']);
+        }
+
+        if ($journal_entry->is_reconciled) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Cette écriture est déjà réconciliée']);
+        }
+
+        $journal_entry->update([
+            'is_reconciled' => true,
+            'reconciled_at' => now(),
+            'reconciled_by' => auth()->id(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Écriture réconciliée avec succès');
+    }
+
+    /**
+     * Annuler la réconciliation
+     */
+    public function unreconcile(JournalEntry $journal_entry): RedirectResponse
+    {
+        if (!$journal_entry->is_reconciled) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Cette écriture n\'est pas réconciliée']);
+        }
+
+        $journal_entry->update([
+            'is_reconciled' => false,
+            'reconciled_at' => null,
+            'reconciled_by' => null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Réconciliation annulée avec succès');
+    }
 }

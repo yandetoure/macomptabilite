@@ -29,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/journal-entries/journal/view', [JournalEntryController::class, 'journal'])->name('journal-entries.journal');
     Route::resource('journal-entries', JournalEntryController::class);
     Route::post('/journal-entries/{entry}/post', [JournalEntryController::class, 'post'])->name('journal-entries.post');
+    Route::post('/journal-entries/{journal_entry}/reconcile', [JournalEntryController::class, 'reconcile'])->name('journal-entries.reconcile');
+    Route::post('/journal-entries/{journal_entry}/unreconcile', [JournalEntryController::class, 'unreconcile'])->name('journal-entries.unreconcile');
     
     // Factures (Invoices)
     Route::resource('invoices', InvoiceController::class);

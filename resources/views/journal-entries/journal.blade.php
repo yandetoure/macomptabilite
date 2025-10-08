@@ -64,7 +64,7 @@
                     
                     @forelse($entries as $entry)
                     <!-- En-tête d'écriture -->
-                    <div class="mb-4 border-b border-gray-300 pb-2">
+                    <div class="mb-4 border-b border-gray-300 pb-2 {{ $entry->is_reconciled ? 'bg-blue-50 p-3 rounded' : '' }}">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-4">
                                 <a href="{{ route('journal-entries.show', $entry) }}" class="text-blue-600 hover:text-blue-800 font-semibold">
@@ -75,7 +75,12 @@
                                 <span class="text-sm text-gray-500">Réf: {{ $entry->reference }}</span>
                                 @endif
                             </div>
-                            <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Comptabilisé</span>
+                            <div class="flex gap-2">
+                                <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Comptabilisé</span>
+                                @if($entry->is_reconciled)
+                                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">🔒 Réconcilié</span>
+                                @endif
+                            </div>
                         </div>
                         @if($entry->description)
                         <p class="text-sm text-gray-600 mt-1">{{ $entry->description }}</p>
