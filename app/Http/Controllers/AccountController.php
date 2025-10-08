@@ -12,8 +12,13 @@ class AccountController extends Controller
     public function index(): View
     {
         $accounts = Account::orderBy('code')->get();
+        
+        // Grouper les comptes par classe (premier chiffre)
+        $accountsByClass = $accounts->groupBy(function($account) {
+            return substr($account->code, 0, 1);
+        });
 
-        return view('accounts.index', compact('accounts'));
+        return view('accounts.index', compact('accounts', 'accountsByClass'));
     }
 
     public function create(): View

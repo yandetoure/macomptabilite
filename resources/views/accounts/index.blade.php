@@ -18,7 +18,30 @@
             </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
+            @php
+            $classNames = [
+                '1' => 'Classe 1 - Comptes de capitaux',
+                '2' => 'Classe 2 - Comptes d\'immobilisations',
+                '3' => 'Classe 3 - Comptes de stocks',
+                '4' => 'Classe 4 - Comptes de tiers',
+                '5' => 'Classe 5 - Comptes financiers',
+                '6' => 'Classe 6 - Comptes de charges',
+                '7' => 'Classe 7 - Comptes de produits',
+                '8' => 'Classe 8 - Comptes spéciaux',
+            ];
+            @endphp
+
+            @forelse($accountsByClass as $class => $classAccounts)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 mb-6">
+                <!-- En-tête de classe -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white">
+                        {{ $classNames[$class] ?? 'Classe ' . $class }}
+                    </h3>
+                    <p class="text-sm text-blue-100">{{ $classAccounts->count() }} compte(s)</p>
+                </div>
+
+                <!-- Tableau des comptes de la classe -->
                 <div class="p-6">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead>
@@ -32,12 +55,12 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($accounts ?? [] as $account)
-                            <tr>
+                            @foreach($classAccounts as $account)
+                            <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $account->code }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4">
                                     <div class="text-sm text-gray-900">{{ $account->name }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -69,17 +92,18 @@
                                     <a href="{{ route('accounts.edit', $account) }}" class="text-indigo-600 hover:text-indigo-900">Modifier</a>
                                 </td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                    Aucun compte trouvé
-                                </td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
+            @empty
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
+                <div class="p-6 text-center text-gray-500">
+                    Aucun compte trouvé
+                </div>
+            </div>
+            @endforelse
         </div>
     </div>
 </x-app-layout>
