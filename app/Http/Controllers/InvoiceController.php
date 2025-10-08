@@ -222,12 +222,12 @@ class InvoiceController extends Controller
             // Déterminer les comptes selon le type de facture et méthode de paiement
             if ($invoice->type === 'customer') {
                 // Client paie: Banque/Caisse au débit, Client au crédit
-                $debitAccountCode = $validated['payment_method'] === 'cash' ? '531' : '512';
+                $debitAccountCode = $validated['payment_method'] === 'cash' ? '571' : '521';
                 $creditAccountCode = '411';
             } else {
                 // On paie fournisseur: Fournisseur au débit, Banque/Caisse au crédit
                 $debitAccountCode = '401';
-                $creditAccountCode = $validated['payment_method'] === 'cash' ? '531' : '512';
+                $creditAccountCode = $validated['payment_method'] === 'cash' ? '571' : '521';
             }
 
             $debitAccount = \App\Models\Account::where('code', $debitAccountCode)->first();

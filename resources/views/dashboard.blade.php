@@ -114,7 +114,12 @@
                                             @elseif($invoice->status === 'partial') bg-yellow-100 text-yellow-800
                                             @else bg-gray-100 text-gray-800
                                             @endif">
-                                            {{ translate_status($invoice->status) }}
+                                            @if($invoice->status === 'draft') Brouillon
+                                            @elseif($invoice->status === 'pending') En attente
+                                            @elseif($invoice->status === 'partial') Partiel
+                                            @elseif($invoice->status === 'paid') Payé
+                                            @else {{ $invoice->status }}
+                                            @endif
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600">{{ $invoice->party_name }}</p>
