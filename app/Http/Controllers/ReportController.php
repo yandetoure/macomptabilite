@@ -11,23 +11,26 @@ class ReportController extends Controller
 {
     public function balanceSheet(): View
     {
-        // Actifs
+        // Actifs (seulement ceux avec solde non nul)
         $assets = Account::where('type', 'asset')
             ->where('is_active', true)
+            ->where('balance', '!=', 0)
             ->orderBy('code')
             ->get();
         $totalAssets = $assets->sum('balance');
 
-        // Passifs
+        // Passifs (seulement ceux avec solde non nul)
         $liabilities = Account::where('type', 'liability')
             ->where('is_active', true)
+            ->where('balance', '!=', 0)
             ->orderBy('code')
             ->get();
         $totalLiabilities = $liabilities->sum('balance');
 
-        // Capitaux propres
+        // Capitaux propres (seulement ceux avec solde non nul)
         $equity = Account::where('type', 'equity')
             ->where('is_active', true)
+            ->where('balance', '!=', 0)
             ->orderBy('code')
             ->get();
         $totalEquity = $equity->sum('balance');
@@ -41,16 +44,18 @@ class ReportController extends Controller
 
     public function financialStatement(): View
     {
-        // Produits (Revenues)
+        // Produits (Revenues) - seulement ceux avec solde non nul
         $revenues = Account::where('type', 'revenue')
             ->where('is_active', true)
+            ->where('balance', '!=', 0)
             ->orderBy('code')
             ->get();
         $totalRevenues = $revenues->sum('balance');
 
-        // Charges (Expenses)
+        // Charges (Expenses) - seulement ceux avec solde non nul
         $expenses = Account::where('type', 'expense')
             ->where('is_active', true)
+            ->where('balance', '!=', 0)
             ->orderBy('code')
             ->get();
         $totalExpenses = $expenses->sum('balance');
@@ -67,17 +72,33 @@ class ReportController extends Controller
 
     public function trialBalance(): View
     {
-        // Tous les comptes actifs avec leurs soldes
         $accounts = Account::where('is_active', true)
             ->orderBy('code')
             ->get();
-
-        // Grouper par type
+        
+        // Calculer les totaux débit/crédit pour chaque compte à partir des lignes d'écriture
+        foreach ($accounts as $account) {
+            $totalDebit = \App\Models\JournalEntryLine::whereHas('journalEntry', function($q) {
+                $q->where('status', 'posted');
+            })
+            ->where('account_id', $account->id)
+            ->sum('debit');
+            
+            $totalCredit = \App\Models\JournalEntryLine::whereHas('journalEntry', function($q) {
+                $q->where('status', 'posted');
+            })
+            ->where('account_id', $account->id)
+            ->sum('credit');
+            
+            $account->total_debit = $totalDebit;
+            $account->total_credit = $totalCredit;
+            $account->solde = $totalCredit - $totalDebit; // Crédit - Débit
+        }
+        
         $accountsByType = $accounts->groupBy('type');
-
-        // Calculer les totaux
-        $totalDebit = $accounts->filter(fn($a) => $a->balance > 0)->sum('balance');
-        $totalCredit = $accounts->filter(fn($a) => $a->balance < 0)->sum(fn($a) => abs($a->balance));
+        
+        $totalDebit = $accounts->sum('total_debit');
+        $totalCredit = $accounts->sum('total_credit');
 
         return view('reports.trial-balance', compact('accounts', 'accountsByType', 'totalDebit', 'totalCredit'));
     }

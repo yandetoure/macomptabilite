@@ -62,14 +62,18 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm {{ $account->balance > 0 ? 'font-semibold text-gray-900' : 'text-gray-400' }}">
-                                    {{ $account->balance > 0 ? format_currency($account->balance) : '-' }}
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm {{ $account->total_debit > 0 ? 'font-semibold text-gray-900' : 'text-gray-400' }}">
+                                    {{ $account->total_debit > 0 ? format_currency($account->total_debit) : '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm {{ $account->balance < 0 ? 'font-semibold text-gray-900' : 'text-gray-400' }}">
-                                    {{ $account->balance < 0 ? format_currency(abs($account->balance)) : '-' }}
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm {{ $account->total_credit > 0 ? 'font-semibold text-gray-900' : 'text-gray-400' }}">
+                                    {{ $account->total_credit > 0 ? format_currency($account->total_credit) : '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold {{ $account->balance >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ format_currency(abs($account->balance)) }}
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold {{ $account->solde >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                    @if($account->solde < 0)
+                                        - {{ format_currency(abs($account->solde)) }}
+                                    @else
+                                        {{ format_currency($account->solde) }}
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -77,16 +81,29 @@
                             <!-- Sous-total par type -->
                             <tr class="bg-gray-50 font-semibold">
                                 <td colspan="3" class="px-6 py-3 text-sm text-gray-900">
-                                    Sous-total {{ ucfirst($type) }}
+                                    Sous-total 
+                                    @if($type === 'asset') Actif
+                                    @elseif($type === 'liability') Passif
+                                    @elseif($type === 'equity') Capitaux propres
+                                    @elseif($type === 'revenue') Produits
+                                    @elseif($type === 'expense') Charges
+                                    @endif
                                 </td>
                                 <td class="px-6 py-3 text-right text-sm text-gray-900">
-                                    {{ format_currency($typeAccounts->filter(fn($a) => $a->balance > 0)->sum('balance')) }}
+                                    {{ format_currency($typeAccounts->sum('total_debit')) }}
                                 </td>
                                 <td class="px-6 py-3 text-right text-sm text-gray-900">
-                                    {{ format_currency($typeAccounts->filter(fn($a) => $a->balance < 0)->sum(fn($a) => abs($a->balance))) }}
+                                    {{ format_currency($typeAccounts->sum('total_credit')) }}
                                 </td>
                                 <td class="px-6 py-3 text-right text-sm text-gray-900">
-                                    {{ format_currency(abs($typeAccounts->sum('balance'))) }}
+                                    @php
+                                        $soldeSousTotal = $typeAccounts->sum('solde');
+                                    @endphp
+                                    @if($soldeSousTotal < 0)
+                                        - {{ format_currency(abs($soldeSousTotal)) }}
+                                    @else
+                                        {{ format_currency($soldeSousTotal) }}
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -97,7 +114,14 @@
                                 <td class="px-6 py-4 text-right text-base text-blue-600">{{ format_currency($totalDebit) }}</td>
                                 <td class="px-6 py-4 text-right text-base text-blue-600">{{ format_currency($totalCredit) }}</td>
                                 <td class="px-6 py-4 text-right text-base text-blue-600">
-                                    {{ format_currency($totalDebit + $totalCredit) }}
+                                    @php
+                                        $soldeGeneral = $totalCredit - $totalDebit;
+                                    @endphp
+                                    @if($soldeGeneral < 0)
+                                        - {{ format_currency(abs($soldeGeneral)) }}
+                                    @else
+                                        {{ format_currency($soldeGeneral) }}
+                                    @endif
                                 </td>
                             </tr>
                         </tbody>

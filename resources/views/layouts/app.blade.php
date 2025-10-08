@@ -81,10 +81,15 @@
                         Plan comptable
                     </a>
 
-                    <a href="{{ route('journal-entries.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('journal-entries.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <span class="mr-3">📝</span>
-                        Écritures
-                    </a>
+            <a href="{{ route('journal-entries.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('journal-entries.index') || request()->routeIs('journal-entries.create') || request()->routeIs('journal-entries.show') || request()->routeIs('journal-entries.edit') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                <span class="mr-3">📝</span>
+                Écritures
+            </a>
+
+            <a href="{{ route('journal-entries.journal') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('journal-entries.journal') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                <span class="mr-3">📖</span>
+                Journal
+            </a>
 
                     <a href="{{ route('cards.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('cards.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <span class="mr-3">🎴</span>
