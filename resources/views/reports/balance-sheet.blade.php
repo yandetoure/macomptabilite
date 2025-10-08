@@ -7,111 +7,147 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- ACTIF -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200">ACTIF</h3>
-                        
-                        <div class="space-y-2">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
+                <div class="p-6">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Bilan Comptable</h3>
+                        <p class="text-sm text-gray-600 mt-1">État de la situation financière : Actif, Passif et Capitaux propres</p>
+                    </div>
+
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom du compte</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- ACTIF -->
+                            <tr class="bg-blue-50">
+                                <td colspan="4" class="px-6 py-3">
+                                    <span class="font-bold text-blue-900 uppercase text-sm">📊 ACTIF</span>
+                                </td>
+                            </tr>
+                            
                             @foreach($assets as $account)
-                            <div class="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-900">{{ $account->code }}</span>
-                                    <span class="text-sm text-gray-600 ml-2">{{ $account->name }}</span>
-                                </div>
-                                <span class="text-sm font-semibold text-gray-900">{{ format_currency($account->balance) }}</span>
-                            </div>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $account->code }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ $account->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                        Actif
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-blue-600">
+                                    {{ format_currency($account->balance) }}
+                                </td>
+                            </tr>
                             @endforeach
-                        </div>
-
-                        <div class="mt-6 pt-4 border-t-2 border-gray-300">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold text-gray-900">TOTAL ACTIF</span>
-                                <span class="text-xl font-bold text-blue-600">{{ format_currency($totalAssets) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PASSIF + CAPITAUX PROPRES -->
-                <div class="space-y-6">
-                    <!-- PASSIF -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200">PASSIF</h3>
                             
-                            <div class="space-y-2">
-                                @foreach($liabilities as $account)
-                                <div class="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded">
-                                    <div>
-                                        <span class="text-sm font-medium text-gray-900">{{ $account->code }}</span>
-                                        <span class="text-sm text-gray-600 ml-2">{{ $account->name }}</span>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-900">{{ format_currency($account->balance) }}</span>
-                                </div>
-                                @endforeach
-                            </div>
+                            <!-- Sous-total Actif -->
+                            <tr class="bg-blue-100 font-bold">
+                                <td colspan="3" class="px-6 py-3 text-sm text-blue-900">TOTAL ACTIF</td>
+                                <td class="px-6 py-3 text-right text-base text-blue-900">{{ format_currency($totalAssets) }}</td>
+                            </tr>
 
-                            <div class="mt-4 pt-3 border-t border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-base font-bold text-gray-900">Total Passif</span>
-                                    <span class="text-base font-bold text-gray-900">{{ format_currency($totalLiabilities) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CAPITAUX PROPRES -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200">CAPITAUX PROPRES</h3>
+                            <!-- PASSIF -->
+                            <tr class="bg-red-50">
+                                <td colspan="4" class="px-6 py-3">
+                                    <span class="font-bold text-red-900 uppercase text-sm">📉 PASSIF</span>
+                                </td>
+                            </tr>
                             
-                            <div class="space-y-2">
-                                @foreach($equity as $account)
-                                <div class="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded">
-                                    <div>
-                                        <span class="text-sm font-medium text-gray-900">{{ $account->code }}</span>
-                                        <span class="text-sm text-gray-600 ml-2">{{ $account->name }}</span>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-900">{{ format_currency($account->balance) }}</span>
-                                </div>
-                                @endforeach
-                            </div>
+                            @foreach($liabilities as $account)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $account->code }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ $account->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                        Passif
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-red-600">
+                                    {{ format_currency($account->balance) }}
+                                </td>
+                            </tr>
+                            @endforeach
+                            
+                            <!-- Sous-total Passif -->
+                            <tr class="bg-red-100 font-semibold">
+                                <td colspan="3" class="px-6 py-3 text-sm text-red-900">Sous-total Passif</td>
+                                <td class="px-6 py-3 text-right text-sm text-red-900">{{ format_currency($totalLiabilities) }}</td>
+                            </tr>
 
-                            <div class="mt-4 pt-3 border-t border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-base font-bold text-gray-900">Total Capitaux propres</span>
-                                    <span class="text-base font-bold text-gray-900">{{ format_currency($totalEquity) }}</span>
-                                </div>
-                            </div>
+                            <!-- CAPITAUX PROPRES -->
+                            <tr class="bg-purple-50">
+                                <td colspan="4" class="px-6 py-3">
+                                    <span class="font-bold text-purple-900 uppercase text-sm">💼 CAPITAUX PROPRES</span>
+                                </td>
+                            </tr>
+                            
+                            @foreach($equity as $account)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $account->code }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ $account->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                                        Capitaux propres
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-purple-600">
+                                    {{ format_currency($account->balance) }}
+                                </td>
+                            </tr>
+                            @endforeach
+                            
+                            <!-- Sous-total Capitaux propres -->
+                            <tr class="bg-purple-100 font-semibold">
+                                <td colspan="3" class="px-6 py-3 text-sm text-purple-900">Sous-total Capitaux propres</td>
+                                <td class="px-6 py-3 text-right text-sm text-purple-900">{{ format_currency($totalEquity) }}</td>
+                            </tr>
+
+                            <!-- TOTAL GÉNÉRAL PASSIF + CAPITAUX -->
+                            <tr class="bg-gray-200 font-bold border-t-2 border-gray-400">
+                                <td colspan="3" class="px-6 py-4 text-base text-gray-900">TOTAL PASSIF + CAPITAUX PROPRES</td>
+                                <td class="px-6 py-4 text-right text-lg text-gray-900">{{ format_currency($totalLiabilities + $totalEquity) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Équilibre du bilan -->
+                    <div class="mt-6 p-4 rounded-lg {{ abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.01 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }}">
+                        <div class="flex items-center justify-center">
+                            @if(abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.01)
+                            <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-green-800 font-semibold">✓ Bilan équilibré - Actif ({{ format_currency($totalAssets) }}) = Passif + Capitaux ({{ format_currency($totalLiabilities + $totalEquity) }})</span>
+                            @else
+                            <svg class="w-6 h-6 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-red-800 font-semibold">⚠️ Bilan non équilibré - Différence : {{ format_currency(abs($totalAssets - ($totalLiabilities + $totalEquity))) }}</span>
+                            @endif
                         </div>
                     </div>
 
-                    <!-- TOTAL PASSIF + CAPITAUX -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-gray-900">TOTAL PASSIF + CAPITAUX</span>
-                            <span class="text-xl font-bold text-blue-600">{{ format_currency($totalLiabilities + $totalEquity) }}</span>
+                    <!-- Résumé -->
+                    <div class="mt-6 grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <div class="text-xs text-blue-600 uppercase font-semibold">Total Actif</div>
+                            <div class="text-xl font-bold text-blue-900 mt-1">{{ format_currency($totalAssets) }}</div>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                            <div class="text-xs text-red-600 uppercase font-semibold">Total Passif</div>
+                            <div class="text-xl font-bold text-red-900 mt-1">{{ format_currency($totalLiabilities) }}</div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                            <div class="text-xs text-purple-600 uppercase font-semibold">Capitaux Propres</div>
+                            <div class="text-xl font-bold text-purple-900 mt-1">{{ format_currency($totalEquity) }}</div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Équilibre du bilan -->
-            <div class="mt-6 p-4 rounded-lg {{ abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.01 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }}">
-                <div class="flex items-center justify-center">
-                    @if(abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.01)
-                    <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="text-green-800 font-semibold">Bilan équilibré</span>
-                    @else
-                    <svg class="w-6 h-6 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="text-red-800 font-semibold">Bilan non équilibré (différence: {{ format_currency(abs($totalAssets - ($totalLiabilities + $totalEquity))) }})</span>
-                    @endif
                 </div>
             </div>
         </div>
